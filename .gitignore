@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# build outputs
+dist/
+.vite/
+coverage/
+*.tsbuildinfo
+
+# local env / secrets
+.env
+.env.local
+.env.*.local
+.dev.vars
+
+# Cloudflare local state
+.wrangler/
+
+# OS/editor files
+.DS_Store

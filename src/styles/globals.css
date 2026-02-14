@@ -1,0 +1,81 @@
+@import './color-scheme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --radius: 0.75rem;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  font-family: 'IBM Plex Sans', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  background-image:
+    radial-gradient(circle at 18% 0%, hsl(var(--page-glow-primary) / 0.08), transparent 38%),
+    radial-gradient(circle at 100% 0%, hsl(var(--page-glow-secondary) / 0.08), transparent 34%),
+    linear-gradient(hsl(var(--background)), hsl(var(--background)));
+}
+
+* {
+  scrollbar-color: hsl(var(--border)) hsl(var(--background));
+}
+
+.metric {
+  font-family: 'JetBrains Mono', 'Roboto Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  letter-spacing: 0.01em;
+}
+
+.dev-surface {
+  border: 1px solid hsl(var(--border));
+  background: linear-gradient(180deg, hsl(var(--surface-gradient-from)), hsl(var(--surface-gradient-to)));
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.04);
+}
+
+.progress-track {
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border));
+}
+
+.cli-progress-track {
+  position: relative;
+  height: 14px;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid hsl(var(--border));
+  background:
+    repeating-linear-gradient(
+      90deg,
+      hsl(213 12% 20%) 0,
+      hsl(213 12% 20%) 8px,
+      hsl(214 14% 17%) 8px,
+      hsl(214 14% 17%) 10px
+    );
+}
+
+.cli-progress-fill {
+  height: 100%;
+  border-right: 1px solid hsl(39 72% 48% / 0.9);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      hsl(142 59% 33%) 0,
+      hsl(142 59% 33%) 8px,
+      hsl(142 62% 29%) 8px,
+      hsl(142 62% 29%) 10px
+    );
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.12);
+  transition: width 250ms ease;
+}
+
+.new-food {
+  color: hsl(var(--new-food));
+}
+
+.old-food {
+  color: hsl(var(--old-food));
+}
+
+:root[data-theme='light'] .dashboard-plan-title {
+  color: #0969da;
+}

@@ -1,0 +1,95 @@
+:root,
+:root[data-theme='dark'] {
+  --background: 216 26% 7%;
+  --foreground: 210 17% 82%;
+  --card: 214 22% 11%;
+  --card-foreground: 210 17% 82%;
+  --primary: 142 59% 33%;
+  --primary-foreground: 210 40% 98%;
+  --muted: 214 18% 14%;
+  --muted-foreground: 214 10% 62%;
+  --border: 213 12% 21%;
+  --input: 213 12% 21%;
+  --ring: 142 59% 33%;
+
+  --new-food: 142 59% 33%;
+  --old-food: 39 72% 48%;
+  --status-ok: 142 59% 33%;
+  --status-warn: 39 72% 48%;
+
+  --surface-gradient-from: 214 22% 11%;
+  --surface-gradient-to: 216 24% 9%;
+  --page-glow-primary: 142 59% 33%;
+  --page-glow-secondary: 39 72% 48%;
+}
+
+:root[data-theme='light'] {
+  --background: 210 30% 98%;
+  --foreground: 222 30% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 30% 15%;
+  --primary: 142 65% 30%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 210 24% 94%;
+  --muted-foreground: 220 12% 40%;
+  --border: 214 20% 84%;
+  --input: 214 20% 84%;
+  --ring: 142 65% 30%;
+
+  --new-food: 142 65% 30%;
+  --old-food: 39 80% 40%;
+  --status-ok: 142 65% 30%;
+  --status-warn: 39 80% 40%;
+
+  --surface-gradient-from: 0 0% 100%;
+  --surface-gradient-to: 210 30% 97%;
+  --page-glow-primary: 142 65% 30%;
+  --page-glow-secondary: 39 80% 40%;
+}
+
+/* Friendly mode has softer, consumer-oriented tones and spacing. */
+:root[data-user-mode='friendly'] {
+  --radius: 1rem;
+}
+
+:root[data-user-mode='friendly'][data-theme='dark'] {
+  --background: 219 22% 12%;
+  --foreground: 210 24% 90%;
+  --card: 220 20% 16%;
+  --card-foreground: 210 24% 90%;
+  --primary: 167 64% 42%;
+  --primary-foreground: 210 40% 98%;
+  --muted: 220 16% 20%;
+  --muted-foreground: 215 13% 74%;
+  --border: 220 14% 28%;
+  --input: 220 14% 28%;
+  --ring: 167 64% 42%;
+
+  --new-food: 167 64% 42%;
+  --old-food: 39 82% 61%;
+  --surface-gradient-from: 220 20% 16%;
+  --surface-gradient-to: 219 20% 14%;
+  --page-glow-primary: 167 64% 42%;
+  --page-glow-secondary: 39 82% 61%;
+}
+
+:root[data-user-mode='friendly'][data-theme='light'] {
+  --background: 46 42% 96%;
+  --foreground: 220 22% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 22% 20%;
+  --primary: 167 58% 38%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 47 28% 91%;
+  --muted-foreground: 220 12% 44%;
+  --border: 46 20% 82%;
+  --input: 46 20% 82%;
+  --ring: 167 58% 38%;
+
+  --new-food: 167 58% 38%;
+  --old-food: 31 83% 48%;
+  --surface-gradient-from: 0 0% 100%;
+  --surface-gradient-to: 47 28% 94%;
+  --page-glow-primary: 167 58% 38%;
+  --page-glow-secondary: 31 83% 48%;
+}

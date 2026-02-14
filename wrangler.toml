@@ -1,0 +1,15 @@
+name = "food-migration-push"
+main = "worker/index.ts"
+compatibility_date = "2026-02-12"
+
+[[d1_databases]]
+binding = "food_migration_db"
+database_name = "food-migration-db"
+database_id = "2546386f-b01d-415d-83bf-c9f8f317e19e"
+
+[vars]
+# Set this to the same public key you use in .env.local
+VAPID_PUBLIC_KEY = "BG-xiQQQK4yej0XlAV5G5-bh3DOE3BqP_Xdfdk8Vl6OjU663lCAMSIsAsx5UStaonmeOHvUlTqXxzTHyN_LpkIk"
+
+[triggers]
+crons = ["*/1 * * * *"]
