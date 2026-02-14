@@ -56,11 +56,10 @@ async function resolveReminderNotification(time) {
       return undefined;
     }
 
+    const today = formatLocalDate(new Date());
+    const { oldAmountPerFeeding, newAmountPerFeeding } = getDailyAmountPerFeeding(plan, today);
     const oldLabel = formatFoodLabel('旧餌', plan.oldFoodName);
     const newLabel = formatFoodLabel('新餌', plan.newFoodName);
-    const feedingTimesPerDay = Number(plan.feedingTimesPerDay) > 0 ? Number(plan.feedingTimesPerDay) : 1;
-    const oldAmountPerFeeding = Math.floor(Number(plan.oldFoodAmountPerDay || 0) / feedingTimesPerDay);
-    const newAmountPerFeeding = Math.floor(Number(plan.newFoodAmountPerDay || 0) / feedingTimesPerDay);
     const unit = plan.unit || 'g';
 
     return {
@@ -79,6 +78,72 @@ async function resolveReminderNotification(time) {
 function formatFoodLabel(base, name) {
   const trimmed = typeof name === 'string' ? name.trim() : '';
   return trimmed ? `${base}(${trimmed})` : base;
+}
+
+function getDailyAmountPerFeeding(plan, dateStr) {
+  const feedingTimesPerDay = Number(plan.feedingTimesPerDay) > 0 ? Number(plan.feedingTimesPerDay) : 1;
+  const oldPerFeedingBase = Number(plan.oldFoodAmountPerDay || 0) / feedingTimesPerDay;
+  const newPerFeedingBase = Number(plan.newFoodAmountPerDay || 0) / feedingTimesPerDay;
+
+  const duration = calculateDurationDays(plan);
+  const dayIndex = resolveDayIndex(plan.startDate, dateStr);
+  const clampedDayIndex = clamp(dayIndex, 0, duration - 1);
+
+  const newRatio =
+    plan.transitionMode === 'days'
+      ? Math.round(((clampedDayIndex + 1) / duration) * 100)
+      : Math.min((clampedDayIndex + 1) * normalizeStepPercent(plan.stepPercent), 100);
+  const oldRatio = 100 - newRatio;
+
+  return {
+    oldAmountPerFeeding: Math.floor(oldPerFeedingBase * (oldRatio / 100)),
+    newAmountPerFeeding: Math.floor(newPerFeedingBase * (newRatio / 100))
+  };
+}
+
+function calculateDurationDays(plan) {
+  if (plan.transitionMode === 'days') {
+    return Math.max(1, Math.floor(Number(plan.switchDays) || 0));
+  }
+  return Math.ceil(100 / normalizeStepPercent(plan.stepPercent));
+}
+
+function normalizeStepPercent(stepPercent) {
+  const parsed = Number(stepPercent);
+  return parsed > 0 ? parsed : 100;
+}
+
+function resolveDayIndex(startDate, targetDate) {
+  const start = parseLocalDate(startDate);
+  const target = parseLocalDate(targetDate);
+  const startEpochDay = Math.floor(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate()) / 86400000);
+  const targetEpochDay = Math.floor(Date.UTC(target.getFullYear(), target.getMonth(), target.getDate()) / 86400000);
+  return targetEpochDay - startEpochDay;
+}
+
+function parseLocalDate(value) {
+  const [y, m, d] = String(value || '').split('-').map(Number);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) {
+    return new Date();
+  }
+  return new Date(y, m - 1, d);
+}
+
+function formatLocalDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function clamp(value, min, max) {
+  if (value < min) {
+    return min;
+  }
+  if (value > max) {
+    return max;
+  }
+  return value;
 }
 
 function formatTime(date) {

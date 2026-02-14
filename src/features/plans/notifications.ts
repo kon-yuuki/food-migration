@@ -1,4 +1,5 @@
 import { type Plan, type ReminderInput } from '@/features/plans/types';
+import { formatDate, parseDate } from '@/lib/utils';
 
 const PUSH_SUBSCRIPTION_KEY = 'food-migration:push-subscription';
 const SW_READY_TIMEOUT_MS = 5000;
@@ -208,8 +209,7 @@ export function scheduleInAppReminder(plan: Plan, time: string): number | undefi
 }
 
 function buildReminderNotificationContent(plan: Plan, time: string): ReminderNotificationContent {
-  const oldAmountPerFeeding = Math.floor(plan.oldFoodAmountPerDay / plan.feedingTimesPerDay);
-  const newAmountPerFeeding = Math.floor(plan.newFoodAmountPerDay / plan.feedingTimesPerDay);
+  const { oldAmountPerFeeding, newAmountPerFeeding } = getDailyAmountPerFeeding(plan, formatDate(new Date()));
   const oldFoodLabel = formatFoodLabel('旧餌', plan.oldFoodName);
   const newFoodLabel = formatFoodLabel('新餌', plan.newFoodName);
   const unit = plan.unit || 'g';
@@ -223,6 +223,57 @@ function buildReminderNotificationContent(plan: Plan, time: string): ReminderNot
 function formatFoodLabel(base: string, name?: string): string {
   const trimmed = name?.trim();
   return trimmed ? `${base}(${trimmed})` : base;
+}
+
+function getDailyAmountPerFeeding(plan: Plan, dateStr: string): { oldAmountPerFeeding: number; newAmountPerFeeding: number } {
+  const feedingTimesPerDay = Number(plan.feedingTimesPerDay) > 0 ? Number(plan.feedingTimesPerDay) : 1;
+  const oldPerFeedingBase = Number(plan.oldFoodAmountPerDay || 0) / feedingTimesPerDay;
+  const newPerFeedingBase = Number(plan.newFoodAmountPerDay || 0) / feedingTimesPerDay;
+
+  const duration = calculateDurationDaysForPlan(plan);
+  const dayIndex = resolveDayIndex(plan.startDate, dateStr);
+  const clampedDayIndex = clamp(dayIndex, 0, duration - 1);
+
+  const newRatio =
+    plan.transitionMode === 'days'
+      ? Math.round(((clampedDayIndex + 1) / duration) * 100)
+      : Math.min((clampedDayIndex + 1) * normalizeStepPercent(plan.stepPercent), 100);
+  const oldRatio = 100 - newRatio;
+
+  return {
+    oldAmountPerFeeding: Math.floor(oldPerFeedingBase * (oldRatio / 100)),
+    newAmountPerFeeding: Math.floor(newPerFeedingBase * (newRatio / 100))
+  };
+}
+
+function calculateDurationDaysForPlan(plan: Pick<Plan, 'transitionMode' | 'switchDays' | 'stepPercent'>): number {
+  if (plan.transitionMode === 'days') {
+    return Math.max(1, Math.floor(Number(plan.switchDays) || 0));
+  }
+  return Math.ceil(100 / normalizeStepPercent(plan.stepPercent));
+}
+
+function normalizeStepPercent(stepPercent: number): number {
+  const parsed = Number(stepPercent);
+  return parsed > 0 ? parsed : 100;
+}
+
+function resolveDayIndex(startDate: string, targetDate: string): number {
+  const start = parseDate(startDate);
+  const target = parseDate(targetDate);
+  const startEpochDay = Math.floor(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate()) / 86400000);
+  const targetEpochDay = Math.floor(Date.UTC(target.getFullYear(), target.getMonth(), target.getDate()) / 86400000);
+  return targetEpochDay - startEpochDay;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (value < min) {
+    return min;
+  }
+  if (value > max) {
+    return max;
+  }
+  return value;
 }
 
 async function getPushRegistration(): Promise<ServiceWorkerRegistration | undefined> {
